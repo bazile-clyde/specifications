@@ -867,12 +867,12 @@ Drivers will need IAM credentials (an access key and a secret access key) to com
 MUST use these for the IAM access key and IAM secret key, respectively. If a username is provided without a password (or vice-versa) drivers 
 MUST raise an error. An example URI for authentication with MONGODB-IAM using IAM credentials is as follows:
 
-   ``mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM``
+``mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM``
 
 Users MAY have obtained temporary credentials through an `AssumeRole <https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html>`_ 
 request. If so, then in addition to a username and password, users MAY also provide an ``AWS_SESSION_TOKEN`` as a ``mechanism_property``. 
 
-   ``mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM&authMechanismProperties=AWS_SESSION_TOKEN:<security_token>``
+``mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM&authMechanismProperties=AWS_SESSION_TOKEN:<security_token>``
 
 If a username and password are not provided drivers MUST query a link-local AWS address for temporary credentials. If temporary credentials 
 cannot be obtained then drivers MUST fail authentication and raise an error. If the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI``
