@@ -798,13 +798,15 @@ canonical request that Drivers MUST create is as follows:
 
 .. code:: javascript
 
-           Content-Length:43
-           Content-Type:application/x-www-form-urlencoded
-           Host:sts.amazonaws.com
-           X-Amz-Date:20191017T173547Z
-           X-MongoDB-Server-Nonce:enJwWTtNSkR+WztFZCE3d1NWSiMpfU54YCgmPU5lY1RHbnN1IWy6vp7GvmtRmcGWYEtjedGEI0ZXi13r7y4V+A==
-           X-MongoDB-GS2-CB-Flag:n
-           Action=GetCallerIdentity&Version=2011-06-15
+   POST
+   /
+   action=GetCallerIdentity&Version=2011-06-15
+   content-length:43
+   content-type:application/x-www-form-urlencoded
+   host:sts.amazonaws.com
+   x-amz-date:20191017T173547Z
+   x-mongodb-gs2-cb-flag:n
+   x-mongodb-server-nonce:enJwWTtNSkR+WztFZCE3d1NWSiMpfU54YCgmPU5lY1RHbnN1IWy6vp7GvmtRmcGWYEtjedGEI0ZXi13r7y4V+A==
 |
 ======================== ======================================================================================================
 Name                     Value       
