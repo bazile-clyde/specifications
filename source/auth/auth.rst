@@ -698,7 +698,7 @@ imperative, for security sake, that this be as secure and truly random as possib
 
 All messages between MongoDB clients and servers are sent as BSON V1.1 Objects in the payload field of saslStart and saslContinue.
 All fields in these messages have a "short name" which is used in the serialized 
-BSON representation and a human readable "friendly name" which is used in this specification. They are as follows:
+BSON representation and a human-readable "friendly name" which is used in this specification. They are as follows:
 
 ==== ==================== ================= ============================================================================================================================================== 
 Name Friendly Name        Type              Description
@@ -867,14 +867,14 @@ mechanism_properties
 Obtaining Credentials
 `````````````````````
 IAM Credentials
-   If a username and password is provided drivers MUST use these for the IAM access key and IAM secret key, respectively. Drivers MUST 
+   If a username and password are provided drivers MUST use these for the IAM access key and IAM secret key, respectively. Drivers MUST 
    use this secret key to generate a signature using HMAC-SHA256. If a username is provided without a password (or vice-versa) drivers 
    MUST raise an error. An example URI for authentication with MONGODB-IAM using IAM credentials is as follows:
 
    ``mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM``
 
 Temporary IAM Credentials
-   If a username and password is not provided drivers MUST query the standard local AWS endpoint for temporary credentials. If 
+   If a username and password are not provided drivers MUST query the standard local AWS endpoint for temporary credentials. If 
    temporary credentials cannot be obtained then drivers MUST fail authentication and raise an error. If an `AWS_SESSION_TOKEN` is
    provided in addition to a username and password this is considered an `Assume Role <https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html>`_ request. An example URI for authentication with MONGODB-IAM using temporary IAM credentials from an EC2 instance
    or ECS tasks is as follows:
@@ -890,7 +890,7 @@ Temporary IAM Credentials
 
    EC2 Instance
       Calling the endpoint ``http://169.254.169.254/latest/meta-data/iam/security-credentials/`` from an EC2 instance 
-      will return the role attached to the EC2 instance in plaintext, if it exist:
+      will return the role attached to the EC2 instance in plaintext, if it exists:
 
       ``role-name``
 
@@ -909,9 +909,8 @@ Temporary IAM Credentials
             }
 
       .. note::
-
-      The IP address 169.254.169.254 is a link-local address and is valid only from the instance. 
-      See `Instance Metadata and User Data <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html>`_.
+         The IP address 169.254.169.254 is a link-local address and is valid only from the instance. 
+         See `Instance Metadata and User Data <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html>`_.
 
       From this response, drivers will need to extract the ``AccessKeyId``, ``SecretAccessKey`` and the ``Token`` argument values. 
       Drivers will use these values to construct the call to ``sts::getCallerIdentity`` as part of the Amazon Signature V4 algorithm. 
@@ -925,16 +924,17 @@ Temporary IAM Credentials
       .. code:: javascript
 
          {
-          "AccessKeyId": "ACCESS_KEY_ID",
-          "Expiration": "EXPIRATION_DATE",
-          "RoleArn": "TASK_ROLE_ARN",
-          "SecretAccessKey": "SECRET_ACCESS_KEY",
-          "Token": "SECURITY_TOKEN_STRING"
+          "AccessKeyId": "<access_key>",
+          "Expiration": "<date>",
+          "RoleArn": "<task_role_arn>",
+          "SecretAccessKey": "<secret_access_key>",
+          "Token": "<security_token>"
          }
 
       Drivers can use the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` to determine if it should query the ECS tasks or 
-      the EC2 instance endpoint. If the ECS agent populates the ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` environment variable then driver
-      MUST use the ECS endpoint. Otherwise, drivers should attempt to query the EC2 instance endpoint.
+      the EC2 instance endpoint; see `IAM Roles for Tasks <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html>`_. 
+      If the ECS agent populates the ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` environment variable then the driver
+      MUST use the ECS Tasks endpoint specified by the relative URI. Otherwise, drivers MUST attempt to query the EC2 instance endpoint.
 
 -------------------------
 Connection String Options
