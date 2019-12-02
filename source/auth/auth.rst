@@ -720,7 +720,7 @@ of the ASCII character ``n``, i.e., ``110``.
 Conversation
 ````````````
 
-The first message sent by Drivers MUST contain a ``client nonce`` and ``gs2-cb-flag``. In response, the server will send a ``server nonce``
+The first message sent by drivers MUST contain a ``client nonce`` and ``gs2-cb-flag``. In response, the server will send a ``server nonce``
 and ``sts host``. Drivers MUST validate that the server nonce is exactly 64 bytes and the first 32 bytes are the same as the client nonce. 
 Drivers must also validate that the host is greater than 0 and less than or equal to 255 bytes per 
 `RFC 1035 <https://tools.ietf.org/html/rfc1035>`_.  Drivers MUST reject FQDN names with empty labels, e.g., "abc..def", and error on any 
@@ -790,11 +790,11 @@ Client Second:
    }
 |
 
-In response to the Server First message, Drivers MUST follow the `Signature Version 4 Signing Process 
+In response to the Server First message, drivers MUST follow the `Signature Version 4 Signing Process 
 <https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html>`_ to construct the ``authorization header``. The required and optional 
-headers and their associated values Drivers MUST use for the canonical request (see `Summary of Signing Steps
+headers and their associated values drivers MUST use for the canonical request (see `Summary of Signing Steps
 <https://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html>`_) are specified in the table below. An example 
-canonical request that Drivers MUST create is as follows: 
+canonical request that drivers MUST create is as follows: 
 
 .. code:: javascript
 
@@ -830,7 +830,7 @@ Body                     Action=GetCallerIdentity&Version=2011-06-15\n
 
 .. note::
         Region is not a header, but simply part of the authorization header. Region by default is ‘us-east-1’ since this is the 
-        implicit region for ‘sts.amazonaws.com’.  Drivers will need to derive the region to use from the endpoint. The region 
+        implicit region for ‘sts.amazonaws.com’. Drivers will need to derive the region to use from the endpoint. The region 
         is the second piece of a FQDN name. While all official AWS STS endpoints start with “sts.”, there are non-AWS hosted 
         endpoints and test endpoints that will not follow this rule.
 
@@ -882,7 +882,7 @@ request. If so, then in addition to a username and password, users MAY also prov
 |
 If a username and password are not provided drivers MUST query a link-local AWS address for temporary credentials. If temporary credentials 
 cannot be obtained then drivers MUST fail authentication and raise an error. If the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI``
-is set then Drivers MUST assume that it was set by and AWS ECS agent and use the URI 
+is set then drivers MUST assume that it was set by and AWS ECS agent and use the URI 
 ``http://169.254.170.2/$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` to obtain temporary credentials. Querying the URI will return the json response: 
 
 .. code:: javascript
@@ -895,7 +895,7 @@ is set then Drivers MUST assume that it was set by and AWS ECS agent and use the
     "Token": <security_token>
    }
 
-If the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` is not set Drivers MUST assume we are on an EC2 instance and use the 
+If the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` is not set drivers MUST assume we are on an EC2 instance and use the 
 endpoint ``http://169.254.169.254/latest/meta-data/iam/security-credentials/<role-name>`` where as ``role-name`` can obtained from querying the
 URI ``http://169.254.169.254/latest/meta-data/iam/security-credentials/``. The json respone will have the format:
 
