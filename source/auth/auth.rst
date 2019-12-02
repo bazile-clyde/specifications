@@ -824,7 +824,7 @@ Body                     Action=GetCallerIdentity&Version=2011-06-15\n
 ======================== ======================================================================================================
 
 .. note::
-        ``*``, Denotes a header that MUST be included in SignedHeaders if present.
+        ``*``, Denotes a header that MUST be included in SignedHeaders, if present.
 
 .. note::
         Region is not a header, but simply part of the authorization header. Region by default is ‘us-east-1’ since this is the 
@@ -862,35 +862,36 @@ mechanism_properties
 
 Obtaining Credentials
 `````````````````````
-IAM Credentials
-   If a username and password are provided drivers MUST use these for the IAM access key and IAM secret key, respectively. Drivers MUST 
-   use this secret key to generate a signature using HMAC-SHA256. If a username is provided without a password (or vice-versa) drivers 
-   MUST raise an error. An example URI for authentication with MONGODB-IAM using IAM credentials is as follows:
+Drivers will need IAM credentials (an access key and a secret access key) to complete the steps in the `Signature Version 4 Signing Process 
+<https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html?shortFooter=true>`_.  If a username and password are provided drivers 
+MUST use these for the IAM access key and IAM secret key, respectively. If a username is provided without a password (or vice-versa) drivers 
+MUST raise an error. An example URI for authentication with MONGODB-IAM using IAM credentials is as follows:
 
    ``mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM``
 
-Temporary IAM Credentials
-   If a username and password are not provided drivers MUST query the standard local AWS endpoint for temporary credentials. If 
-   temporary credentials cannot be obtained then drivers MUST fail authentication and raise an error. If an `AWS_SESSION_TOKEN` is
-   provided in addition to a username and password this is considered an `Assume Role <https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html>`_ request. An example URI for authentication with MONGODB-IAM using temporary IAM credentials from an EC2 instance
-   or ECS tasks is as follows:
-
-   ``mongodb://mongodb.example.com/?authMechanism=MONGODB-IAM``
-
-   An example using temporary IAM credentials as an Assume Role request is as follows:
+Users MAY have obtained temporary credentials through an `AssumeRole <https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html>`_ 
+request. If so, then in addition to a username and password, users MAY also provide an ``AWS_SESSION_TOKEN`` as a ``mechanism_property``. 
 
    ``mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM&authMechanismProperties=AWS_SESSION_TOKEN:<security_token>``
 
-.. note::
-   "session token" and "security token" are used interchangeably here and throughout the AWS documentation.
+If a username and password are not provided drivers MUST query a link-local AWS address for temporary credentials. If temporary credentials 
+cannot be obtained then drivers MUST fail authentication and raise an error. If the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI``
+is set then Drivers MUST assume that it was set by and AWS ECS agent and use the URI 
+``http://169.254.170.2/$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` to obtain temporary credentials. Querying the URI will return the json response: 
 
-   EC2 Instance
-      Calling the endpoint ``http://169.254.169.254/latest/meta-data/iam/security-credentials/`` from an EC2 instance 
-      will return the role attached to the EC2 instance in plaintext, if it exists:
+      .. code:: javascript
 
-      ``role-name``
+         {
+          "AccessKeyId": <access_key>,
+          "Expiration": <date>,
+          "RoleArn": <task_role_arn>,
+          "SecretAccessKey": <secret_access_key>,
+          "Token": <security_token>
+         }
 
-      ``http://169.254.169.254/latest/meta-data/iam/security-credentials/<role-name>`` will return the following json response: 
+If the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` is not set Drivers MUST assume we are on an EC2 instance and use the 
+endpoint ``http://169.254.169.254/latest/meta-data/iam/security-credentials/<role-name>`` where as ``role-name`` can obtained from querying the
+URI ``http://169.254.169.254/latest/meta-data/iam/security-credentials/``. The json respone will have the format:
 
       .. code:: javascript
 
@@ -904,33 +905,7 @@ Temporary IAM Credentials
                 "Expiration": <date>
             }
 
-      .. note::
-         The IP address 169.254.169.254 is a link-local address and is valid only from the instance. 
-         See `Instance Metadata and User Data <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html>`_.
-
-      From this response, drivers will need to extract the ``AccessKeyId``, ``SecretAccessKey`` and the ``Token`` argument values. 
-      Drivers will use these values to construct the call to ``sts::getCallerIdentity`` as part of the Amazon Signature V4 algorithm. 
-      Drivers who cache the security temporary credentials must check the expiration date before using them. 
-      If the credentials expire, they must refetch them. 
-
-   ECS Tasks
-      ECS temporary credentials can be retrieved by calling a URL at ``http://169.254.170.2/$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` 
-      where ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` is an environment variable set by the AWS ECS agent.
-
-      .. code:: javascript
-
-         {
-          "AccessKeyId": <access_key>,
-          "Expiration": <date>,
-          "RoleArn": <task_role_arn>,
-          "SecretAccessKey": <secret_access_key>,
-          "Token": <security_token>
-         }
-
-      Drivers can use the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` to determine if it should query the ECS tasks or 
-      the EC2 instance endpoint; see `IAM Roles for Tasks <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html>`_. 
-      If the ECS agent populates the ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` environment variable then the driver
-      MUST use the ECS Tasks endpoint specified by the relative URI. Otherwise, drivers MUST attempt to query the EC2 instance endpoint.
+See `IAM Roles for Tasks <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html>`_.
 
 -------------------------
 Connection String Options
