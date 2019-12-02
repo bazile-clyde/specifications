@@ -792,7 +792,7 @@ Client Second:
 
 In response to the Server First message, Drivers MUST follow the `Signature Version 4 Signing Process 
 <https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html>`_ to construct the ``authorization header``. The required and optional 
-headers and their associated values Driver MUST use for the canoncial request (see `Summary of Signing Steps
+headers and their associated values Drivers MUST use for the canoncial request (see `Summary of Signing Steps
 <https://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html>`_) are specified in the table below. An example 
 canonical request that Drivers MUST create is as follows: 
 
