@@ -719,7 +719,7 @@ of the ASCII character ``n``, i.e., ``110``.
 
 Conversation
 ````````````
-As an example, given a client nonce value of "enJwWTtNSkR+WztFZCE3d1NWSiMpfU54YCgmPU5lY1Q=", a MONGODB-IAM conversation decoded from
+As an example, given a client nonce value of "dzw1U2IwSEtgaWI0IUxZMVJqc2xuQzNCcUxBc05wZjI=", a MONGODB-IAM conversation decoded from
 BSON to JSON would appear as follows:
 
 Client First
