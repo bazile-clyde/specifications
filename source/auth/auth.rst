@@ -924,11 +924,11 @@ Temporary IAM Credentials
       .. code:: javascript
 
          {
-          "AccessKeyId": "<access_key>",
-          "Expiration": "<date>",
-          "RoleArn": "<task_role_arn>",
-          "SecretAccessKey": "<secret_access_key>",
-          "Token": "<security_token>"
+          "AccessKeyId": <access_key>,
+          "Expiration": <date>,
+          "RoleArn": <task_role_arn>,
+          "SecretAccessKey": <secret_access_key>,
+          "Token": <security_token>
          }
 
       Drivers can use the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` to determine if it should query the ECS tasks or 
