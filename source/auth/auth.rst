@@ -867,8 +867,9 @@ Drivers will need IAM credentials (an access key and a secret access key) to com
 MUST use these for the IAM access key and IAM secret key, respectively. If a username is provided without a password (or vice-versa) drivers 
 MUST raise an error. An example URI for authentication with MONGODB-IAM using IAM credentials is as follows:
 
-``mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM``
-
+.. code:: javascript
+   "mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM"
+|
 Users MAY have obtained temporary credentials through an `AssumeRole <https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html>`_ 
 request. If so, then in addition to a username and password, users MAY also provide an ``AWS_SESSION_TOKEN`` as a ``mechanism_property``. 
 
@@ -881,31 +882,31 @@ cannot be obtained then drivers MUST fail authentication and raise an error. If 
 is set then Drivers MUST assume that it was set by and AWS ECS agent and use the URI 
 ``http://169.254.170.2/$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` to obtain temporary credentials. Querying the URI will return the json response: 
 
-      .. code:: javascript
+.. code:: javascript
 
-         {
-          "AccessKeyId": <access_key>,
-          "Expiration": <date>,
-          "RoleArn": <task_role_arn>,
-          "SecretAccessKey": <secret_access_key>,
-          "Token": <security_token>
-         }
+   {
+    "AccessKeyId": <access_key>,
+    "Expiration": <date>,
+    "RoleArn": <task_role_arn>,
+    "SecretAccessKey": <secret_access_key>,
+    "Token": <security_token>
+   }
 
 If the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` is not set Drivers MUST assume we are on an EC2 instance and use the 
 endpoint ``http://169.254.169.254/latest/meta-data/iam/security-credentials/<role-name>`` where as ``role-name`` can obtained from querying the
 URI ``http://169.254.169.254/latest/meta-data/iam/security-credentials/``. The json respone will have the format:
 
-      .. code:: javascript
+.. code:: javascript
 
-            {
-                "Code": "Success",
-                "LastUpdated" : <date>,
-                "Type": "AWS-HMAC",
-                "AccessKeyId" : <access_key>,
-                "SecretAccessKey": <secret_access_key>,
-                "Token" : <security_token>,
-                "Expiration": <date>
-            }
+      {
+          "Code": "Success",
+          "LastUpdated" : <date>,
+          "Type": "AWS-HMAC",
+          "AccessKeyId" : <access_key>,
+          "SecretAccessKey": <secret_access_key>,
+          "Token" : <security_token>,
+          "Expiration": <date>
+      }
 
 See `IAM Roles for Tasks <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html>`_.
 
