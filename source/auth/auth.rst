@@ -872,8 +872,10 @@ MUST raise an error. An example URI for authentication with MONGODB-IAM using IA
 Users MAY have obtained temporary credentials through an `AssumeRole <https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html>`_ 
 request. If so, then in addition to a username and password, users MAY also provide an ``AWS_SESSION_TOKEN`` as a ``mechanism_property``. 
 
-``mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM&authMechanismProperties=AWS_SESSION_TOKEN:<security_token>``
+.. code:: javascript
 
+   "mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM&authMechanismProperties=AWS_SESSION_TOKEN:<security_token>"
+|
 If a username and password are not provided drivers MUST query a link-local AWS address for temporary credentials. If temporary credentials 
 cannot be obtained then drivers MUST fail authentication and raise an error. If the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI``
 is set then Drivers MUST assume that it was set by and AWS ECS agent and use the URI 
