@@ -868,6 +868,7 @@ MUST use these for the IAM access key and IAM secret key, respectively. If a use
 MUST raise an error. An example URI for authentication with MONGODB-IAM using IAM credentials is as follows:
 
 .. code:: javascript
+
    "mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM"
 |
 Users MAY have obtained temporary credentials through an `AssumeRole <https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html>`_ 
