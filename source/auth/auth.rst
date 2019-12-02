@@ -719,6 +719,13 @@ of the ASCII character ``n``, i.e., ``110``.
 
 Conversation
 ````````````
+
+The first message sent by Drivers MUST contain a ``client nonce`` and ``gs2-cb-flag``. In response, the server will send a ``server nonce``
+and ``sts host``. Drivers MUST validate that the server nonce is exactly 64 bytes and the first 32 bytes are the same as the client nonce. 
+Drivers must also validate that the host is greater than 0 and less than or equal to 255 bytes per 
+`RFC 1035 <https://tools.ietf.org/html/rfc1035>`_.  Drivers MUST reject FQDN names with empty labels, e.g., "abc..def", and error on any 
+additional fields. Drivers MUST respond to the server's message with an ``authorization header`` and a ``date``.
+
 As an example, given a client nonce value of "dzw1U2IwSEtgaWI0IUxZMVJqc2xuQzNCcUxBc05wZjI=", a MONGODB-IAM conversation decoded from
 BSON to JSON would appear as follows:
 
@@ -749,7 +756,7 @@ Client Second
        "d" : "20191107T002607Z"
    }
 |
-Each message above will be encoded as BSON V1.1 objects and sent to the server as the value of ``payload``. Therefore, the SASL conversation would appear as:
+Each message above will be encoded as BSON V1.1 objects and sent to the peer as the value of ``payload``. Therefore, the SASL conversation would appear as:
 
 Client First
 
@@ -782,22 +789,12 @@ Client Second:
        "payload" : new BinData(0, "LQEAAAJhAAkBAABBV1M0LUhNQUMtU0hBMjU2IENyZWRlbnRpYWw9QUtJQUlDR1ZMS09LWlZZM1gzREEvMjAxOTExMTIvdXMtZWFzdC0xL3N0cy9hd3M0X3JlcXVlc3QsIFNpZ25lZEhlYWRlcnM9Y29udGVudC1sZW5ndGg7Y29udGVudC10eXBlO2hvc3Q7eC1hbXotZGF0ZTt4LW1vbmdvZGItZ3MyLWNiLWZsYWc7eC1tb25nb2RiLXNlcnZlci1ub25jZSwgU2lnbmF0dXJlPThhMTI0NGZjODYyZTI5YjZiZjc0OTFmMmYwNDE5NDY2ZGNjOTFmZWU1MTJhYTViM2ZmZjQ1NDY3NDEwMjJiMmUAAmQAEQAAADIwMTkxMTEyVDIxMDEyMloAAA==")
    }
 |
-Drivers MUST validate that the server nonce is exactly 64 bytes and the first 32 bytes are the same as the client nonce. 
-Drivers must also validate that the host is greater than 0 and less than or equal to 255 bytes per 
-`RFC 1035 <https://tools.ietf.org/html/rfc1035>`_.  Drivers MUST reject FQDN names with empty labels, e.g., 
-"abc..def", and error on any additional fields.  
 
-`Signing AWS API Requests <https://docs.aws.amazon.com/general/latest/gr/signing_aws_api_requests.html>`_
-   In response to the Server First message, the driver MUST construct a call to sts::GetCallerIdentity with its credentials 
-   including the base 64 representation of the server nonce, as a signed header named X-MongoDB-Server-Nonce. It must also 
-   include X-MongoDB-GS2-CB-Flag as a signed header. The value of X-MongoDB-GS2-CB-Flag MUST be the single ASCII character n. 
-   These headers must be included in the list of SignedHeaders in the authorization header. For constructing an authorization header
-   see `Adding Signing Information to the Authorization Header 
-   <https://docs.aws.amazon.com/general/latest/gr/sigv4-add-signature-to-request.html>`_.
-   For generating the Signature see `Calculate the Signature for AWS Signature Version 4 
-   <https://docs.aws.amazon.com/general/latest/gr/sigv4-calculate-signature.html>`_. 
-   There is one optional field, X-Amz-Security-Token, which are temporary credentials used to generate the signature. See the table
-   below for the values drivers must use when generating an authorization header. An example request is as follows:
+In response to the Server First message, Drivers MUST follow the `Signature Version 4 Signing Process 
+<https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html>`_ to construct the ``authorization header``. The required headers and 
+values Driver MUST use for `Signing AWS Requests with Signature Version 4 <https://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html>`_ 
+are specified in the table below. An example `Canonical Request 
+<https://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html>`_ that Drivers MUST create in order to `Create a String to Sign <https://docs.aws.amazon.com/general/latest/gr/sigv4-create-string-to-sign.html>`_ is as follows:
 
 .. code:: javascript
 
@@ -807,7 +804,6 @@ Drivers must also validate that the host is greater than 0 and less than or equa
            X-Amz-Date:20191017T173547Z
            X-MongoDB-Server-Nonce:enJwWTtNSkR+WztFZCE3d1NWSiMpfU54YCgmPU5lY1RHbnN1IWy6vp7GvmtRmcGWYEtjedGEI0ZXi13r7y4V+A==
            X-MongoDB-GS2-CB-Flag:n
-           Authorization:AWS4-HMAC-SHA256 Credential=AKIAICGVLKOKZVY3X3DA/20191017/us-east-1/sts/aws4_request, SignedHeaders=content-length;content-type;host;x-amz-date;x-mongodb-gs2-cb-flag;x-mongodb-server-nonce, Signature=6f67c4dfbc05da04ea8d571bc6f7d11833f9d1909d0068be302c5379e1867d15
            Action=GetCallerIdentity&Version=2011-06-15
 |
 ======================== ======================================================================================================
@@ -820,7 +816,7 @@ Content-Length*          43
 Host*                    Host field from Server First Message
 Region                   Derived from Host - see below
 X-Amz-Date*              See `Amazon Documentation <https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html?shortFooter=true>`_
-X-Amz-Security-Token*    Optional, See `Amazon Documentation <https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html?shortFooter=true>`_
+X-Amz-Security-Token*    Optional, see `Amazon Documentation <https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html?shortFooter=true>`_
 X-MongoDB-Server-Nonce*  Base64 string of server nonce
 X-MongoDB-GS2-CB-Flag*   ASCII lower-case character ‘n’ or ‘y’ or ‘p’
 X-MongoDB-Optional-Data* Optional, Optional data, base64 encoded representation of the optional object provided by the client
