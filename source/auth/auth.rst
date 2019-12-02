@@ -880,10 +880,10 @@ request. If so, then in addition to a username and password, users MAY also prov
 
    "mongodb://<access_key>:<secret_key>@mongodb.example.com/?authMechanism=MONGODB-IAM&authMechanismProperties=AWS_SESSION_TOKEN:<security_token>"
 |
-If a username and password are not provided drivers MUST query a link-local AWS address for temporary credentials. If temporary credentials 
+If a username and password are not provided, drivers MUST query a link-local AWS address for temporary credentials. If temporary credentials 
 cannot be obtained then drivers MUST fail authentication and raise an error. If the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI``
-is set then drivers MUST assume that it was set by and AWS ECS agent and use the URI 
-``http://169.254.170.2/$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` to obtain temporary credentials. Querying the URI will return the json response: 
+is set then drivers MUST assume that it was set by an AWS ECS agent and use the URI 
+``http://169.254.170.2/$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` to obtain temporary credentials. Querying the URI will return the JSON response: 
 
 .. code:: javascript
 
@@ -896,8 +896,8 @@ is set then drivers MUST assume that it was set by and AWS ECS agent and use the
    }
 
 If the environment variable ``AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`` is not set drivers MUST assume we are on an EC2 instance and use the 
-endpoint ``http://169.254.169.254/latest/meta-data/iam/security-credentials/<role-name>`` where as ``role-name`` can obtained from querying the
-URI ``http://169.254.169.254/latest/meta-data/iam/security-credentials/``. The json respone will have the format:
+endpoint ``http://169.254.169.254/latest/meta-data/iam/security-credentials/<role-name>`` whereas ``role-name`` can be obtained from querying the
+URI ``http://169.254.169.254/latest/meta-data/iam/security-credentials/``. The JSON response will have the format:
 
 .. code:: javascript
 
