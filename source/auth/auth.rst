@@ -793,8 +793,8 @@ Client Second:
 In response to the Server First message, Drivers MUST follow the `Signature Version 4 Signing Process 
 <https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html>`_ to construct the ``authorization header``. The required headers and 
 values Driver MUST use for `Signing AWS Requests with Signature Version 4 <https://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html>`_ 
-are specified in the table below. An example `Canonical Request 
-<https://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html>`_ that Drivers MUST create in order to `Create a String to Sign <https://docs.aws.amazon.com/general/latest/gr/sigv4-create-string-to-sign.html>`_ is as follows:
+are specified in the table below. An example canonical request that Drivers MUST create (see `Create a Canonical Request for Signature 
+Version 4 <https://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html>`_) is as follows: 
 
 .. code:: javascript
 
